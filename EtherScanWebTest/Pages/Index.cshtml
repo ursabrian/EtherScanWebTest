@@ -1,0 +1,133 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+@*<form asp-page-handler="Print" method="post">
+        <button class="btn btn-default">CLICK ME</button>
+    </form>
+
+    <form asp-page-handler="Change" method="post">
+        <button class="btn btn-default">CLICK ME 2</button>
+    </form>*@
+<div class="row">
+
+    <div class="col-6 ">
+
+        <form class="form-horizontal" method="post">
+
+
+            <div class="form-group row p-1 ">
+
+
+
+                <div class="col-12 "></div>
+                <label class="col-4 mb-1">Name</label>                  <input placeholder="Name" type="text" class="form-control col-7  mb-1" name="Name" value=@Model.Name_edit>
+                <label class="col-4  mb-1">Symbol</label>               <input placeholder="Symbol" type="text" class="form-control col-7  mb-1" name="Symbol" value=@Model.Symbol_edit>
+                <label class="col-4  mb-1">Contact Address</label>      <input placeholder="Contact Address" type="text" class="form-control col-7  mb-1" name="Contract_address" value=@Model.Contract_address_edit>
+                <label class="col-4  mb-1">Total Supply</label>         <input placeholder="Total Supply" type="number" class="form-control col-7  mb-1" name="Total_supply" value=@Model.Total_supply_edit>
+                <label class="col-4  mb-1">Total Holders</label>        <input placeholder="Total Holders" type="number" class="form-control col-7  mb-1" name="Total_holders" value=@Model.Total_holders_edit>
+                <label class="col-4  mb-1"></label>       <button type="submit" class="btn btn-primary col-2 mr-1" asp-page-handler="SaveButton">Save</button>    <button class="btn btn-info col-2" asp-page-handler="ResetButton">Reset</button>
+
+            </div>
+
+
+        </form>
+
+
+
+        <form asp-page-handler="Change" method="post">
+        </form>
+
+    </div>
+
+
+    <div class="col-6 ">
+
+        <form asp-page-handler="ChartData" method="post">
+            <div id="chart"></div>
+        </form>
+
+    </div>
+
+</div>
+
+
+
+
+
+@section Scripts
+{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+            var jsonData = $.ajax({
+                url: "/Index?handler=ChartData",
+                dataType: "json",
+                async: false
+            }).responseText;
+            var data = new google.visualization.DataTable(jsonData);
+            var options = {
+                'title': 'Token Statistics by Total supply',
+                'pieHole': 0.2,
+                'legend': { 'position': 'labeled', 'labeledValueText': 'label' },
+                'pieSliceText': 'none',
+                'width': 800,
+                'height': 400
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('chart'));
+            chart.draw(data, options);
+        }
+    </script>
+}
+
+<p>@Model.Message</p>
+<form asp-page-handler="CSV" method="post">
+    <button class="btn btn-default">CSV</button>
+</form>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Rank</th>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>contact Address</th>
+            <th>Total Holders</th>
+            <th>Total supply</th>
+            <th>Total Supply %</th>
+            <th></th>
+        </tr>
+        @foreach (var items in Model.tableList)
+        {
+            <tr>
+
+
+                <td>@items.id </td>
+                <td>@items.Symbol</td>
+                <td>@items.Name</td>
+                <td>@items.Contact</td>
+                <td>@items.Holder</td>
+                <td>@items.Supply</td>
+                <td>@items.SupplyPercent</td>
+                <td>
+                    <form asp-page-handler="view" method="post">
+                        <button class="btn btn-default">Edit</button>
+                        <input type="hidden" name="id" value="@items.id" />
+                    </form>
+
+
+                </td>
+
+            </tr>
+
+        }
+
+    </table>
